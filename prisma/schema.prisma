@@ -1,0 +1,101 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Company {
+  id         String   @id @default(uuid()) 
+  name       String   
+  logo_url   String?  
+  created_at DateTime @default(now()) 
+  updated_at DateTime @updatedAt 
+
+  users    User[]
+  projects Project[]
+  tasks    Task[]
+
+  @@map("companies")
+}
+
+model User {
+  id            String   @id @default(uuid()) 
+  company_id    String   
+  name          String   
+  email         String   @unique 
+  password_hash String   
+  role          String   // 'admin' ou 'member'
+  position      String?  
+  is_active     Boolean  @default(true)
+  created_at    DateTime @default(now()) 
+  updated_at    DateTime @updatedAt 
+
+  company        Company        @relation(fields: [company_id], references: [id])
+  projects       Project[]      @relation("ProjectCreator")
+  created_tasks  Task[]         @relation("TaskCreator")
+  assigned_tasks Task[]         @relation("TaskAssignee")
+  refresh_tokens RefreshToken[]
+
+  @@map("users")
+}
+
+model Project {
+  id          String   @id @default(uuid()) 
+  company_id  String   
+  created_by  String   
+  name        String   
+  description String?  
+  created_at  DateTime @default(now()) 
+  updated_at  DateTime @updatedAt 
+
+  company Company @relation(fields: [company_id], references: [id])
+  creator User    @relation("ProjectCreator", fields: [created_by], references: [id])
+  tasks   Task[]
+
+  @@map("projects")
+}
+
+model Task {
+  id             String    @id @default(uuid()) 
+  company_id     String    
+  created_by     String    
+  assigned_to    String    
+  title          String    
+  description    String?   
+  status         String    // 'todo', 'in_progress', 'done', 'overdue'
+  priority       String    // 'low', 'medium', 'high'
+  due_date       DateTime  
+  completed_at   DateTime? 
+  created_at     DateTime  @default(now()) 
+  updated_at     DateTime  @updatedAt 
+
+  project_id     String?   
+  parent_task_id String?   
+
+  company     Company  @relation(fields: [company_id], references: [id])
+  creator     User     @relation("TaskCreator", fields: [created_by], references: [id])
+  assignee    User     @relation("TaskAssignee", fields: [assigned_to], references: [id])
+  project     Project? @relation(fields: [project_id], references: [id], onDelete: SetNull)
+  
+  parent_task    Task?    @relation("Subtasks", fields: [parent_task_id], references: [id], onDelete: SetNull)
+  subtasks       Task[]   @relation("Subtasks")
+
+  last_notified_at DateTime? 
+
+  @@map("tasks")
+}
+
+model RefreshToken {
+  id         String   @id @default(uuid()) 
+  user_id    String   
+  token      String   
+  expires_at DateTime 
+  created_at DateTime @default(now()) 
+
+  user User @relation(fields: [user_id], references: [id])
+
+  @@map("refresh_tokens")
+}
