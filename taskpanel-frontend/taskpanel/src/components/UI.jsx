@@ -70,11 +70,12 @@ export function Btn({ children, onClick, type = 'button', variant = 'primary', d
 }
 
 // ── Input ──────────────────────────────────────────────────────
-export function Input({ label, error, ...props }) {
+export const Input = React.forwardRef(function Input({ label, error, ...props }, ref) {
   return (
     <div style={{ marginBottom: 16 }}>
       {label && <label style={{ display: 'block', fontSize: 12, fontWeight: 500, color: 'var(--gray-600)', marginBottom: 5 }}>{label}</label>}
       <input
+        ref={ref}
         style={{
           width: '100%', height: 40, padding: '0 12px', borderRadius: 'var(--radius-md)',
           border: `1px solid ${error ? 'var(--red-400)' : 'var(--gray-200)'}`,
@@ -88,14 +89,15 @@ export function Input({ label, error, ...props }) {
       {error && <span style={{ fontSize: 11, color: 'var(--red-400)', marginTop: 3, display: 'block' }}>{error}</span>}
     </div>
   );
-}
+});
 
 // ── Select ─────────────────────────────────────────────────────
-export function Select({ label, error, children, ...props }) {
+export const Select = React.forwardRef(function Select({ label, error, children, ...props }, ref) {
   return (
     <div style={{ marginBottom: 16 }}>
       {label && <label style={{ display: 'block', fontSize: 12, fontWeight: 500, color: 'var(--gray-600)', marginBottom: 5 }}>{label}</label>}
       <select
+        ref={ref}
         style={{
           width: '100%', height: 40, padding: '0 12px', borderRadius: 'var(--radius-md)',
           border: `1px solid ${error ? 'var(--red-400)' : 'var(--gray-200)'}`,
@@ -106,7 +108,7 @@ export function Select({ label, error, children, ...props }) {
       {error && <span style={{ fontSize: 11, color: 'var(--red-400)', marginTop: 3, display: 'block' }}>{error}</span>}
     </div>
   );
-}
+});
 
 // ── Modal ──────────────────────────────────────────────────────
 export function Modal({ open, onClose, title, children, width = 480 }) {

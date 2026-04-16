@@ -25,7 +25,7 @@ export default function Profile() {
 
   const onChangePass = async (data) => {
     try {
-      await usersAPI.updatePass({ currentPassword: data.current, newPassword: data.newPass });
+      await usersAPI.updatePass({ password: data.newPass });
       resetPass();
       showSuccess('Senha alterada com sucesso!');
     } catch { setErrMsg('Senha atual incorreta.'); }
